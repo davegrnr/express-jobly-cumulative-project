@@ -95,6 +95,7 @@ describe("get", function () {
     expect(company).toEqual({
       handle: "c1",
       name: "C1",
+      jobs: expect.any(Array),
       description: "Desc1",
       numEmployees: 1,
       logoUrl: "http://c1.img",
