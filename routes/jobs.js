@@ -85,6 +85,42 @@ router.get("/:id", async (req, res, next) => {
     }
 })
 
+/** PATCH /[jobId]  { fld1, fld2, ... } => { job }
+ *
+ * Data can include: { title, salary, equity }
+ *
+ * Returns { id, title, salary, equity, companyHandle }
+ *
+ * Authorization required: admin
+ */
+
+router.patch("/:id", ensureAdmin, async (req, res, next) => {
+    try{
+        const validator = jsonschema.validate(req.body, jobUpdateSchema);
+        if(!validator.valid){
+            const errs = validator.errors.map(e => e.stack);
+            throw new BadRequestError(errs);
+        }
+        const job = await Job.update(req.params.id, req.body);
+        return res.json({ job })
+    } catch(e){
+        return next(e)
+    }
+})
+
+/** DELETE /[handle] => { deleted: id }
+ * Auth required: admin
+ */
+
+router.delete("/:id", ensureAdmin, async (req, res, next) => {
+    try{
+        await Job.remove(req.params.id);
+        return res.json({ deleted: +req.params.id});
+    }catch (e){
+        return next(err)
+    }
+})
+
 
 
 module.exports = router;
