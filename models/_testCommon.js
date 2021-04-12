@@ -14,8 +14,8 @@ async function commonBeforeAll() {
   await db.query(`
     INSERT INTO companies(handle, name, num_employees, description, logo_url)
     VALUES ('c1', 'C1', 1, 'Desc1', 'http://c1.img'),
-           ('c2', 'C2', 2, 'Desc2', 'http://c2.img'),
-           ('c3', 'C3', 3, 'Desc3', 'http://c3.img')`);
+            ('c2', 'C2', 2, 'Desc2', 'http://c2.img'),
+            ('c3', 'C3', 3, 'Desc3', 'http://c3.img')`);
 
   await db.query(`
         INSERT INTO users(username,
@@ -39,6 +39,11 @@ async function commonBeforeAll() {
         ('Job4', NULL, NULL, 'c1')
     RETURNING id`);
     testJobIds.splice(0, 0, ...resultsJobs.rows.map(r => r.id));
+
+    await db.query(`
+    INSERT INTO applications(username, job_id)
+    VALUES ('u1', $1)`,
+  [testJobIds[0]]);
 }
 
 async function commonBeforeEach() {

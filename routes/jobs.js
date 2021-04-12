@@ -117,7 +117,7 @@ router.delete("/:id", ensureAdmin, async (req, res, next) => {
         await Job.remove(req.params.id);
         return res.json({ deleted: +req.params.id});
     }catch (e){
-        return next(err)
+        return next(e);
     }
 })
 

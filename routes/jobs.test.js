@@ -265,10 +265,10 @@ describe("DELETE /jobs/:id", function () {
         expect(resp.statusCode).toBe(401)
     });
 
-    // test("404 for no such job", async () => {
-    //     const resp = await request(app)
-    //         .delete(`/jobs/0`)
-    //         .set("authorization", `Bearer ${adminToken}`);
-    //     expect(resp.statusCode).toBe(404)
-    // });
+    test("404 for no such job", async () => {
+        const resp = await request(app)
+            .delete(`/jobs/0`)
+            .set("authorization", `Bearer ${adminToken}`);
+        expect(resp.statusCode).toBe(404)
+    });
 });
