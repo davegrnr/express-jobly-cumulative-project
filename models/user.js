@@ -130,8 +130,8 @@ class User {
                   last_name AS "lastName",
                   email,
                   is_admin AS "isAdmin"
-           FROM users
-           WHERE username = $1`,
+          FROM users
+          WHERE username = $1`,
         [username],
     );
 
@@ -139,6 +139,12 @@ class User {
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
 
+    const userApplicationsRes = await db.query(
+      `SELECT a.job_id
+      FROM applications AS a
+      WHERE a.username = $1`, [username]);
+
+    user.applications = userApplicationsRes.rows.map(a => a.job_id);
     return user;
   }
 
@@ -190,14 +196,43 @@ class User {
     return user;
   }
 
+  /**Lets users apply to a job 
+   * 
+   * -username: username applying for job
+   * -jobId: job id
+  */
+
+  static async applyToJob(username, jobId) {
+    const preCheck = await db.query(
+          `SELECT id
+          FROM jobs
+          WHERE id = $1`, [jobId]);
+    const job = preCheck.rows[0];
+
+    if (!job) throw new NotFoundError(`No job: ${jobId}`);
+
+    const preCheck2 = await db.query(
+          `SELECT username
+          FROM users
+          WHERE username = $1`, [username]);
+    const user = preCheck2.rows[0];
+
+    if (!user) throw new NotFoundError(`No username: ${username}`);
+
+    await db.query(
+          `INSERT INTO applications (job_id, username)
+          VALUES ($1, $2)`,
+        [jobId, username]);
+  }
+
   /** Delete given user from database; returns undefined. */
 
   static async remove(username) {
     let result = await db.query(
           `DELETE
-           FROM users
-           WHERE username = $1
-           RETURNING username`,
+            FROM users
+            WHERE username = $1
+            RETURNING username`,
         [username],
     );
     const user = result.rows[0];
