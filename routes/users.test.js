@@ -189,6 +189,22 @@ describe("GET /users/:username", function () {
     });
   });
 
+  test("works for users", async function () {
+    const resp = await request(app)
+        .get(`/users/u1`)
+        .set("authorization", `Bearer ${adminToken}`);
+    expect(resp.body).toEqual({
+      user: {
+        username: "u1",
+        firstName: "U1F",
+        lastName: "U1L",
+        email: "user1@user.com",
+        isAdmin: false,
+        applications: expect.any(Array)
+      },
+    });
+  });
+
   test("unauth for anon", async function () {
     const resp = await request(app)
         .get(`/users/u1`);
@@ -198,7 +214,7 @@ describe("GET /users/:username", function () {
   test("not found if user not found", async function () {
     const resp = await request(app)
         .get(`/users/nope`)
-        .set("authorization", `Bearer ${u1Token}`);
+        .set("authorization", `Bearer ${adminToken}`);
     expect(resp.statusCode).toEqual(404);
   });
 });
